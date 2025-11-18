@@ -1,6 +1,7 @@
 pipeline {
     agent any
     environment {
+        APP_NAME = 'poste05-app'
         DOCKER_USER = 'herved'
     }
     stages {
