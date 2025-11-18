@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         APP_NAME = 'poste05-app'
+        ARTIFACT_NAME = 'app.tar.gz'
         DOCKER_USER = 'herved'
     }
     stages {
@@ -12,7 +13,7 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+ /*       stage('Build') {
             steps {
                 script {
                     def buildVersion = "1.0.${env.BUILD_NUMBER}"
@@ -31,6 +32,18 @@ pipeline {
                     def buildVersion = "1.0.${env.BUILD_NUMBER}"
                     echo "Deploying ${APP_NAME} version ${buildVersion}"
                 }
+            }
+        }*/
+        stage('Build') {
+            steps {
+                sh 'echo "Contenu de l\'application" > app.txt'
+                sh 'tar -czf ${ARTIFACT_NAME} app.txt'
+                archiveArtifacts artifacts: ARTIFACT_NAME, fingerprint: true
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo "Déploiement de ${ARTIFACT_NAME}"
             }
         }
     }
