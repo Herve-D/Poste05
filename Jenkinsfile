@@ -1,23 +1,49 @@
 pipeline {
     agent any
- 
+    environment {
+        APP_NAME = 'poste05-app'
+        ARTIFACT_NAME = 'app.tar.gz'
+        DOCKER_USER = 'herved'
+    }
     stages {
- 
-        stage('Build') {
+        stage('Login Docker') {
             steps {
-                echo 'Building...'
+                withCredentials([string(credentialsId: 'POSTE05_DOCKER_PASSWORD', variable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
             }
         }
- 
+ /*       stage('Build') {
+            steps {
+                script {
+                    def buildVersion = "1.0.${env.BUILD_NUMBER}"
+                    echo "Building ${APP_NAME} version ${buildVersion}"
+                }
+            }
+        }
         stage('Test') {
             steps {
-                echo 'Testing...'
+                echo "Testing ${APP_NAME}..."
             }
         }
- 
         stage('Deploy') {
             steps {
-                echo 'Deploying...'
+                script {
+                    def buildVersion = "1.0.${env.BUILD_NUMBER}"
+                    echo "Deploying ${APP_NAME} version ${buildVersion}"
+                }
+            }
+        }*/
+        stage('Build') {
+            steps {
+                sh 'echo "Contenu de l\'application" > app.txt'
+                sh 'tar -czf ${ARTIFACT_NAME} app.txt'
+                archiveArtifacts artifacts: ARTIFACT_NAME, fingerprint: true
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo "Déploiement de ${ARTIFACT_NAME}"
             }
         }
     }
